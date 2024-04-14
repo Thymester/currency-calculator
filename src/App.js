@@ -33,7 +33,7 @@ function App() {
         total += value * coinValue;
       }
     }
-    return numberWithCommas(total.toFixed(2));
+    return numberWithCommas(total.toFixed(2)); // Ensure total has max of 2 decimal points
   };
   
   const numberWithCommas = (number) => {
@@ -57,19 +57,33 @@ function App() {
     }
   };
 
+  const calculateBillValue = (bill, value) => {
+    const billAmount = parseInt(bill.substring(1));
+    return (value * billAmount).toFixed(2); // Limit decimal points to 2
+  };
+
+  const calculateCoinValue = (coin, value) => {
+    const coinAmount = getCoinValue(coin);
+    return (value * coinAmount).toFixed(2); // Limit decimal points to 2
+  };
+
   const handleBillChange = (event, bill) => {
     const value = event.target.value;
-    setBills(prevState => ({ ...prevState, [bill]: value }));
+    if (!isNaN(value) || value === '') {
+      setBills(prevState => ({ ...prevState, [bill]: value }));
+    }
   };
-
+  
   const handleCoinChange = (event, coin) => {
     const value = event.target.value;
-    setCoins(prevState => ({ ...prevState, [coin]: value }));
+    if (!isNaN(value) || value === '') {
+      setCoins(prevState => ({ ...prevState, [coin]: value }));
+    }
   };
-
+  
   return (
     <div className="App">
-      <h1>US Currency Calculator</h1>
+      <h1>Currency Calculator</h1>
       <div>
         <h2>Bills</h2>
         {Object.entries(bills).map(([bill, value]) => (
@@ -81,6 +95,7 @@ function App() {
               value={value}
               onChange={e => handleBillChange(e, bill)}
             />
+            <label>${calculateBillValue(bill, value)}</label>
           </div>
         ))}
       </div>
@@ -95,6 +110,7 @@ function App() {
               value={value}
               onChange={e => handleCoinChange(e, coin)}
             />
+            <label>${calculateCoinValue(coin, value)}</label>
           </div>
         ))}
       </div>
