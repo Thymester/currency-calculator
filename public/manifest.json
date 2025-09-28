@@ -1,6 +1,6 @@
 {
-  "short_name": "Currency Calculator",
-  "name": "Currency Calculator",
+  "short_name": "Till Counter",
+  "name": "Till Counter",
   "icons": [
     {
       "src": "favicon.ico",
