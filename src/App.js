@@ -65,23 +65,6 @@ const FileText = ({ size = 24, color = "currentColor" }) => (
   </svg>
 );
 
-const Download = ({ size = 24, color = "currentColor" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-    <polyline points="7 10 12 15 17 10"></polyline>
-    <line x1="12" y1="15" x2="12" y2="3"></line>
-  </svg>
-);
-
-const Calendar = ({ size = 24, color = "currentColor" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-    <line x1="16" y1="2" x2="16" y2="6"></line>
-    <line x1="8" y1="2" x2="8" y2="6"></line>
-    <line x1="3" y1="10" x2="21" y2="10"></line>
-  </svg>
-);
-
 function App() {
   const [bills, setBills] = useState({
     100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 1: 0
@@ -97,7 +80,6 @@ function App() {
   const [countPurpose, setCountPurpose] = useState('');
   const [expectedAmount, setExpectedAmount] = useState('');
   const [notes, setNotes] = useState('');
-  const [savedCounts, setSavedCounts] = useState([]);
   const [showBusinessFeatures, setShowBusinessFeatures] = useState(false);
   const [startingCash, setStartingCash] = useState('');
   const [showCalculator, setShowCalculator] = useState(false);
@@ -192,34 +174,6 @@ function App() {
     setShift('');
   };
 
-  const saveCount = () => {
-    if (total === 0) return;
-    
-    const newCount = {
-      id: Date.now(),
-      date: new Date(),
-      purpose: countPurpose || 'General Count',
-      register: selectedRegister,
-      employee: employeeName,
-      shift: shift,
-      total: total,
-      expected: expectedAmount ? parseFloat(expectedAmount) : null,
-      startingCash: startingCash ? parseFloat(startingCash) : null,
-      netCash: netCash,
-      variance: variance,
-      bills: { ...bills },
-      coins: { ...coins },
-      notes: notes,
-      billsTotal: totalBills,
-      coinsTotal: totalCoins,
-      billCount: billCount,
-      coinCount: coinCount
-    };
-    
-    setSavedCounts(prev => [newCount, ...prev.slice(0, 49)]);
-    clearAll();
-  };
-
   // Calculator functions
   const calculate = (expression) => {
     try {
@@ -251,7 +205,7 @@ function App() {
   };
 
   const generateReport = () => {
-    const report = `LUMBER COMPANY CASH COUNT REPORT
+    const report = `COMPANY CASH COUNT REPORT
 ${'='.repeat(60)}
 Generated: ${formatDateTime(new Date())}
 
@@ -282,42 +236,13 @@ ${Object.entries(coins).filter(([_, count]) => count > 0).map(([denom, count]) =
   `  ${coinData[denom].name} × ${count} = ${formatCurrency((parseInt(denom) / 100) * count)}`).join('\n')}
 
 ${notes ? `NOTES: ${notes}\n` : ''}
-
-RECENT SAVED COUNTS:
-${'-'.repeat(30)}
-${savedCounts.slice(0, 5).map(count => 
-  `${formatDateTime(count.date)} | ${count.register || 'N/A'} | ${count.employee || 'N/A'} | ${count.purpose}: ${formatCurrency(count.total)}${count.variance !== 0 ? ` (Var: ${formatCurrency(count.variance)})` : ''}`).join('\n')}
-
-${'='.repeat(60)}
-End of Report
 `;
     
     const blob = new Blob([report], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `lumber-company-cash-report-${new Date().toISOString().split('T')[0]}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const exportData = () => {
-    const data = {
-      exportDate: new Date().toISOString(),
-      counts: savedCounts,
-      summary: {
-        totalCounts: savedCounts.length,
-        totalAmount: savedCounts.reduce((sum, count) => sum + count.total, 0),
-        avgVariance: savedCounts.filter(c => c.variance !== 0).reduce((sum, count, _, arr) => 
-          sum + Math.abs(count.variance) / arr.length, 0)
-      }
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `lumber-company-cash-data-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `company-cash-report-${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -691,63 +616,11 @@ End of Report
             📋 Copy Total
           </button>
 
-          {total > 0 && (
-            <button onClick={saveCount} className="action-btn save">
-              <Calendar size={16} />
-              Save Count
-            </button>
-          )}
-
           <button onClick={generateReport} className="action-btn report">
             <FileText size={16} />
             Generate Report
           </button>
-
-          {savedCounts.length > 0 && (
-            <button onClick={exportData} className="action-btn export">
-              <Download size={16} />
-              Export Data
-            </button>
-          )}
         </div>
-
-        {/* Saved Counts */}
-        {savedCounts.length > 0 && (
-          <div className="saved-counts-section">
-            <h3 className="saved-counts-title">Recent Cash Counts</h3>
-            <div className="saved-counts-list">
-              {savedCounts.slice(0, 5).map(count => (
-                <div key={count.id} className="saved-count-item">
-                  <div className="saved-count-header">
-                    <div className="saved-count-info">
-                      <span className="saved-count-date">{formatDateTime(count.date)}</span>
-                      {count.employee && <span className="saved-count-employee">👤 {count.employee}</span>}
-                      {count.register && <span className="saved-count-register">📍 {count.register}</span>}
-                      {count.shift && <span className="saved-count-shift">⏰ {count.shift}</span>}
-                    </div>
-                    <span className="saved-count-purpose">{count.purpose}</span>
-                    <span className={`saved-count-total ${count.variance !== 0 ? 'has-variance' : ''}`}>
-                      {formatCurrency(count.total)} Till counter for bookkeeping and reconciliation
-                    </span>
-                  </div>
-                  {count.variance !== 0 && (
-                    <div className={`saved-count-variance ${count.variance > 0 ? 'over' : 'under'}`}>
-                      Variance: {formatCurrency(count.variance)}
-                    </div>
-                  )}
-                  {count.notes && (
-                    <div className="saved-count-notes">{count.notes}</div>
-                  )}
-                  {count.startingCash && (
-                    <div className="saved-count-net">
-                      Net Sales: {formatCurrency(count.netCash)}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
