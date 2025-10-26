@@ -67,7 +67,7 @@ const FileText = ({ size = 24, color = "currentColor" }) => (
 
 function App() {
   const [bills, setBills] = useState({
-    100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 1: 0
+    100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 2: 0, 1: 0
   });
   
   const [coins, setCoins] = useState({
@@ -95,19 +95,15 @@ function App() {
   };
 
   const countPurposes = [
-    'Daily Till Count', 'Cash Deposit', 'Petty Cash Reconciliation', 
-    'Customer Payment', 'Vendor Payment', 'End of Shift Count',
-    'Bank Deposit Preparation', 'Safe Count', 'Register Audit',
-    'Lumber Delivery Payment', 'Contractor Payment', 'Refund Processing',
-    'Material Purchase', 'Equipment Rental Payment', 'Miscellaneous', 'Other'
+    'Daily Till Count', 'Petty Cash Reconciliation', 'Cash Deposit', 'Cash Return', 'Miscellaneous', 'Other'
   ];
 
   const registers = [
-    'Main Counter', 'Lumber Yard', 'Hardware Section', 'Tool Rental',
-    'Contractor Sales', 'Outdoor Sales', 'Drive-Through', 'Office', 'Warehouse', 'Other'
+    'Main Counter', 'Hardware Section', 'Tool Rental', 'Contractor Sales', 'Outdoor Sales', 'Other'
   ];
 
-  const shifts = ['Morning (6AM-12PM)', 'Afternoon (12PM-6PM)', 'Night (6PM-6AM)', 'Full Day Report', 'Other'];
+  const shifts = ['Morning (6AM-12PM)', 'Afternoon (12PM-6PM)', 'Night (6PM-6AM)', 'Full Day Report', 'Other'
+  ];
 
   const calculateTotal = () => {
     let total = 0;
@@ -162,7 +158,7 @@ function App() {
   };
 
   const clearAll = () => {
-    setBills({ 100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 1: 0 });
+    setBills({ 100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 2: 0, 1: 0 });
     setCoins({ 100: 0, 50: 0, 25: 0, 10: 0, 5: 0, 1: 0 });
     setTotalHistory([]);
     setCountPurpose('');
@@ -277,7 +273,7 @@ ${notes ? `NOTES: ${notes}\n` : ''}
               <Calculator size={24} color="white" />
             </div>
           </div>
-          <p className="subtitle">Till counter for bookkeeping and reconciliation</p>
+          <p className="subtitle">To verify till accuracy.</p>
         </div>
 
         {/* Business Controls */}
@@ -450,6 +446,7 @@ ${notes ? `NOTES: ${notes}\n` : ''}
           <QuickAddButton amount={20} label="$20" />
           <QuickAddButton amount={10} label="$10" />
           <QuickAddButton amount={5} label="$5" />
+          <QuickAddButton amount={2} label="$2" />
           <QuickAddButton amount={1} label="$1" />
           <QuickAddButton amount={0.25} label="25¢" />
           <QuickAddButton amount={0.10} label="10¢" />
